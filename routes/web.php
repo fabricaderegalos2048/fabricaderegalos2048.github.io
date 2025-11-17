@@ -1,11 +1,24 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Ruta para ver el juego 
+Route::get('/game', [GameController::class, 'index'])->name('game');
+
+// Ruta para guardar 
+Route::post('/save-score', [GameController::class, 'saveScore']);
+
+// Ruta para ver el ranking
+Route::get('/leaderboard', [GameController::class, 'leaderboard']);
+
+
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
