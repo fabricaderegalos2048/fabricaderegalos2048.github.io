@@ -136,10 +136,5 @@
         
         // Arrancar
         initGame();
-
-        function saveGame() {
-            alert("Guardar (aún no implementado)");
-        }
-    </script>
 </body>
 </html>

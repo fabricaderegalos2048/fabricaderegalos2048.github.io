@@ -11,7 +11,7 @@ class GameController extends Controller
     // 1. Mostrar la vista del juego
     public function index()
     {
-        return view('game'); // Asegúrate de tener game.blade.php en resources/views
+        return view('game');
     }
 
     // 2. Guardar la puntuación

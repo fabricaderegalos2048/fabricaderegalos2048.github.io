@@ -1,13 +1,20 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\GameController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
+
+// Muestra la portada (welcome.blade.php)
+Route::get('/', [PlayerController::class, 'welcome'])->name('welcome');
+// Recibe los datos del formulario de REGISTRO
+Route::post('/register', [PlayerController::class, 'register'])->name('player.register');
+// Recibe los datos del formulario de LOGIN
+Route::post('/login', [PlayerController::class, 'login'])->name('player.login');
+// Cierra la sesión del jugador
+Route::get('/logout', [PlayerController::class, 'logout'])->name('player.logout');
 // Ruta para ver el juego 
 Route::get('/game', [GameController::class, 'index'])->name('game');
 
@@ -30,4 +37,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+//require __DIR__.'/auth.php';
