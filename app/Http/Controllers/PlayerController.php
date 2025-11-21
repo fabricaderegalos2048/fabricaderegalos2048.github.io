@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Player;
@@ -8,75 +9,80 @@ use Illuminate\Support\Facades\Session; // Para manejar la sesión
 
 class PlayerController extends Controller
 {
-    /**
-     * Muestra la portada con los 2 formularios.
+    /** 
+     * Muestra la portada con los 2 formularios Y el Top 10. 
      */
     public function welcome()
     {
-        // Si el jugador ya está logueado, lo mandamos al juego
-        if (session()->has('player_id')) {
-            return redirect()->route('juegos.adivina');
+        // Esto se queda igual: si ya está logueado, al juego. 
+        if (session()->has('players_id')) {
+            return redirect()->route('game');
         }
-        // 1. Buscamos el Top 10
-        $highScores = Score::with('player') // 'player' es el nombre del método que creamos
-                        ->orderBy('points', 'desc') // Ordenar por puntos (más altos primero)
-                        ->take(10) // Tomar solo 10
-                        ->get();
-
-        // 2. Pasamos los scores a la vista
+        // --- INICIO DE LA MODIFICACIÓN --- 
+        // 1. Buscamos el Top 10 de puntuaciones 
+        // CÓDIGO CORRECTO
+        $highScores = Score::with('players')
+            ->orderBy('points', 'desc')
+            ->take(10)
+            ->get();  // <--- ¡Asegúrate de que esto esté aquí!// 'player' es el nombre del método-relación ->orderBy('points', 'desc') // Ordenar por 'points', de más a menos ->take(10) // Tomar solo los 10 primeros ->get(); 
+        // 2. Pasamos los scores a la vista 
         return view('welcome', [
             'highScores' => $highScores
         ]);
+        // --- FIN DE LA MODIFICACIÓN --- 
     }
+    // ... (El resto de métodos: register, login, logout se quedan igual) ... 
+    // ... (tu función welcome y otras funciones) ...
 
     /**
      * Procesa el formulario de REGISTRO.
      */
     public function register(Request $request)
     {
-        // 1. Validar (required, min 3 letras, y UNICO en la tabla)
-        $request->validate([
-            'name' => 'required|string|min:3|unique:players,name'
+        // 1. Validar los datos
+        $validated = $request->validate([
+            'nickname' => 'required|string|max:20|unique:players,nickname',
         ]);
 
-        // 2. Crear el jugador
+        // 2. Crear el jugador en la base de datos
         $player = Player::create([
-            'name' => $request->name
+            'nickname' => $validated['nickname'],
+            // 'points' => 0   <--- ¡BORRA ESTA LÍNEA! El jugador no tiene puntos aquí.
         ]);
 
-        // 3. Iniciar sesión (guardando el ID en la sesión)
-        session(['player_id' => $player->id]);
+        // 3. Guardar el ID en sesión
+        session(['player_id' => $player->id]); // Ojo: asegúrate de usar 'player_id' (singular) si es lo que usas en el resto de tu código.
 
-        // 4. Redirigir al juego
-        return redirect()->route('juegos.adivina');
+        // 4. Redirigir
+        return redirect()->route('game');
     }
-
-    /**
-     * Procesa el formulario de LOGIN.
-     */
     public function login(Request $request)
     {
-        // 1. Validar (required y DEBE EXISTIR en la tabla)
-        $request->validate([
-            'name' => 'required|string|exists:players,name'
+        // 1. Validar que el nombre existe en la tabla 'players'
+        $validated = $request->validate([
+            'nickname' => 'required|string|exists:players,nickname',
         ]);
 
-        // 2. Buscar al jugador
-        $player = Player::where('name', $request->name)->first();
+        // 2. Recuperar el jugador de la base de datos
+        $player = Player::where('nickname', $validated['nickname'])->first();
 
-        // 3. Iniciar sesión
-        session(['player_id' => $player->id]);
+        // 3. Guardar el ID en la sesión (Login)
+        // NOTA: Uso 'players_id' porque es lo que usaste en tu función welcome y register.
+        session(['players_id' => $player->id]);
 
         // 4. Redirigir al juego
-        return redirect()->route('juegos.adivina');
+        return redirect()->route('game');
     }
 
     /**
-     * Cierra la sesión del jugador.
+     * Cierra la sesión.
      */
     public function logout()
     {
-        session()->forget('player_id');
-        return redirect('/');
+        // Borramos el ID de la sesión
+        session()->forget('players_id');
+
+        // Volvemos a la portada
+        return redirect()->route('welcome');
     }
-}
+} // <--- Esta es la llave final de la clase

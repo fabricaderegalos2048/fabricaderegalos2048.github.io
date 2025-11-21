@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
-    protected $fillable = ['nickname'];
+
+    protected $fillable = ['nickname', 'scores'];
 
     // Un jugador tiene muchas puntuaciones
     public function scores()

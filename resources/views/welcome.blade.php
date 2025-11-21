@@ -13,19 +13,21 @@
 
         <div class="w-full max-w-4xl flex flex-col md:flex-row justify-center gap-6 px-6">
 
+            <!-- FORMULARIO DE REGISTRO (NUEVO JUGADOR) -->
             <div class="w-full md:w-1/2 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
-                
+
+                <!-- CORRECCIÓN 1: La ruta ahora apunta a 'player.register' -->
                 <form method="POST" action="{{ route('player.register') }}">
                     @csrf
                     <h2 class="text-2xl font-semibold text-center mb-4">Soy Nuevo</h2>
                     <div>
-                        <label for="name_reg" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Elige tu Nombre</label>
-                        <input id="name_reg" type="text" name="name" 
-                               class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 rounded-md shadow-sm mt-1" 
-                               required autofocus value="{{ old('name') }}">
-                        
-                        @error('name', 'default')
-                            <span class="text-sm text-red-600 mt-2">{{ $message }}</span>
+                        <label for="nickname_reg" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Elige tu Nombre</label>
+
+                        <!-- CORRECCIÓN 2: Cambiado nickname="nickname" por name="nickname" -->
+                        <input id="nickname_reg" type="text" name="nickname" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 rounded-md shadow-sm mt-1" required autofocus value="{{ old('nickname') }}">
+
+                        @error('nickname')
+                        <span class="text-sm text-red-600 mt-2">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="flex items-center justify-end mt-4">
@@ -37,17 +39,18 @@
 
                 <hr class="my-8 border-gray-600">
 
+                <!-- FORMULARIO DE LOGIN (YA TENGO USUARIO) -->
                 <form method="POST" action="{{ route('player.login') }}">
                     @csrf
                     <h2 class="text-2xl font-semibold text-center mb-4">Ya tengo Usuario</h2>
                     <div>
-                        <label for="name_login" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Mi Nombre</label>
-                        <input id="name_login" type="text" name="name" 
-                               class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 rounded-md shadow-sm mt-1" 
-                               required>
-                               
-                        @error('name', 'default')
-                            <span class="text-sm text-red-600 mt-2">{{ $message }}</span>
+                        <label for="nickname_login" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Mi Nombre</label>
+
+                        <!-- CORRECCIÓN 3: Cambiado nickname="nickname" por name="nickname" -->
+                        <input id="nickname_login" type="text" name="nickname" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 rounded-md shadow-sm mt-1" required>
+
+                        @error('nickname')
+                        <span class="text-sm text-red-600 mt-2">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="flex items-center justify-end mt-4">
@@ -58,33 +61,35 @@
                 </form>
             </div>
 
+            <!-- TOP 10 PUNTUACIONES -->
             <div class="w-full md:w-1/2 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
                 <h2 class="text-2xl font-semibold text-center mb-4 text-gray-900 dark:text-gray-100">
                     Top 10 - Adivina el Número
                 </h2>
-                
-                @if($highScores->isEmpty())
-                    <p class="text-center text-gray-500 dark:text-gray-400">
-                        ¡Aún no hay puntuaciones! ¡Sé el primero!
-                    </p>
-                @else
-                    <ol class="list-decimal list-inside space-y-3 text-gray-700 dark:text-gray-300">
-                        @foreach($highScores as $index => $score)
-                            <li class="text-lg">
-                                @if($index == 0) 🥇
-                                @elseif($index == 1) 🥈
-                                @elseif($index == 2) 🥉
-                                @endif
 
-                                <span class="font-bold">{{ $score->player->name }}</span>
-                                - {{ $score->points }} puntos
-                            </li>
-                        @endforeach
-                    </ol>
+                @if($highScores->isEmpty())
+                <p class="text-center text-gray-500 dark:text-gray-400">
+                    ¡Aún no hay puntuaciones! ¡Sé el primero!
+                </p>
+                @else
+                <ol class="list-decimal list-inside space-y-3 text-gray-700 dark:text-gray-300">
+                    @foreach($highScores as $index => $score)
+                    <li class="text-lg">
+                        @if($index == 0) 🥇
+                        @elseif($index == 1) 🥈
+                        @elseif($index == 2) 🥉
+                        @endif
+
+                        <!-- Usamos optional() por seguridad si se borró un jugador pero quedó el score -->
+                        <span class="font-bold">{{ optional($score->player)->nickname ?? 'Anónimo' }}</span>
+                        - {{ $score->points }} puntos
+                    </li>
+                    @endforeach
+                </ol>
                 @endif
             </div>
 
         </div>
-        </div>
+    </div>
 </body>
 </html>
