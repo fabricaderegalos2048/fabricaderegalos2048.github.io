@@ -3,53 +3,52 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Player; // Importante: Importar el modelo Player
-use App\Models\Score;  // Importante: Importar el modelo Score
+use App\Models\Player;
+use App\Models\Score;
 
 class GameController extends Controller
 {
     // 1. Mostrar la vista del juego
     public function index()
     {
-        return view('game');
+        // Verificar si hay un usuario en sesión
+        if (!session()->has('player_id')) {
+            return redirect()->route('welcome');
+        }
+
+        // Buscar al jugador para pasar su nombre a la vista
+        $player = Player::find(session('player_id'));
+
+        return view('game', ['currentPlayer' => $player]);
     }
 
-    // 2. Guardar la puntuación
+    // 2. Guardar la puntuación (MODIFICADO PARA USAR SESIÓN)
     public function saveScore(Request $request)
     {
-        // Validamos los datos que vienen del navegador
+        // 1. Validar
         $request->validate([
-            'nickname' => 'required|string|max:20',
             'score' => 'required|integer'
         ]);
 
-        // Buscamos al jugador por su nickname.
-        // Si no existe, Laravel lo crea automáticamente gracias a firstOrCreate.
-        $player = Player::firstOrCreate(
-            ['nickname' => $request->nickname]
-        );
+        // 2. Obtener jugador de la sesión
+        $playerId = session('player_id');
+        
+        if (!$playerId) {
+            return response()->json(['status' => 'error', 'message' => 'Sesión expirada']);
+        }
 
-        // Creamos la puntuación vinculada a ese jugador
-        $score = $player->scores()->create([
+        $player = Player::find($playerId);
+
+        // 3. GUARDAR SIEMPRE (Sin comprobar nada)
+        // Esto crea un registro nuevo cada vez, guardando el historial completo.
+        $player->scores()->create([
             'points' => $request->score
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => '¡Puntuación guardada correctamente!',
-            'player' => $player->nickname,
-            'points' => $score->points
+            'message' => 'Puntuación registrada', 
+            'points' => $request->score
         ]);
-    }
-
-    // 3. (Opcional) Obtener ranking para mostrar en pantalla
-    public function leaderboard()
-    {
-        $scores = Score::with('player')
-                    ->orderBy('points', 'desc')
-                    ->take(10)
-                    ->get();
-
-        return response()->json($scores);
     }
 }

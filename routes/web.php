@@ -19,7 +19,7 @@ Route::get('/logout', [PlayerController::class, 'logout'])->name('player.logout'
 Route::get('/game', [GameController::class, 'index'])->name('game');
 
 // Ruta para guardar 
-Route::post('/save-score', [GameController::class, 'saveScore']);
+Route::post('/guardar-score', [GameController::class, 'saveScore'])->name('score.save');
 
 // Ruta para ver el ranking
 Route::get('/leaderboard', [GameController::class, 'leaderboard']);

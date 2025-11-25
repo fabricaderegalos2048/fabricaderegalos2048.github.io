@@ -21,10 +21,11 @@ class PlayerController extends Controller
         // --- INICIO DE LA MODIFICACIÓN --- 
         // 1. Buscamos el Top 10 de puntuaciones 
         // CÓDIGO CORRECTO
-        $highScores = Score::with('players')
+        $highScores = Score::with('player')
             ->orderBy('points', 'desc')
             ->take(10)
             ->get();  // <--- ¡Asegúrate de que esto esté aquí!// 'player' es el nombre del método-relación ->orderBy('points', 'desc') // Ordenar por 'points', de más a menos ->take(10) // Tomar solo los 10 primeros ->get(); 
+        
         // 2. Pasamos los scores a la vista 
         return view('welcome', [
             'highScores' => $highScores
