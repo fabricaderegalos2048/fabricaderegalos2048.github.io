@@ -69,7 +69,7 @@ class PlayerController extends Controller
 
         // 3. Guardar el ID en la sesión (Login)
         // NOTA: Uso 'players_id' porque es lo que usaste en tu función welcome y register.
-        session(['players_id' => $player->id]);
+        session(['player_id' => $player->id]);
 
         // 4. Redirigir al juego
         return redirect()->route('game');

@@ -243,6 +243,7 @@
             <button onclick="startGame()">
                 REINTENTAR
             </button>
+
         </div>
     </div>
 
