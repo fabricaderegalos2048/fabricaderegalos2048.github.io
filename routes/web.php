@@ -14,7 +14,7 @@ Route::post('/register', [PlayerController::class, 'register'])->name('player.re
 // Recibe los datos del formulario de LOGIN
 Route::post('/login', [PlayerController::class, 'login'])->name('player.login');
 // Cierra la sesión del jugador
-Route::get('/logout', [PlayerController::class, 'logout'])->name('player.logout');
+Route::post('/logout', [PlayerController::class, 'logout'])->name('player.logout');
 // Ruta para ver el juego 
 Route::get('/game', [GameController::class, 'index'])->name('game');
 
