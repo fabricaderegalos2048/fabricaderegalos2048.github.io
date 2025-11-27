@@ -8,7 +8,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
-        /* --- ESTILO ARCADE --- */
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
@@ -17,13 +16,12 @@
             --bg-dark: #111;
             --bg-panel: #222;
         }
-
         body {
             font-family: 'Press Start 2P', cursive;
             background-color: #050505;
             background-image:
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+                linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,255,0,0.06));
             background-size: 100% 2px, 3px 100%;
             display: flex;
             flex-direction: column;
@@ -32,28 +30,14 @@
             color: white;
             text-transform: uppercase;
         }
+        h1 { color: var(--neon-yellow); font-size: 35px; text-shadow: 4px 4px 0px #b84805; margin-bottom: 10px; letter-spacing: 2px; }
+        h3 { font-size: 12px; color: var(--neon-blue); margin: 0; padding-bottom: 10px; }
 
-        h1 {
-            color: var(--neon-yellow);
-            font-size: 35px;
-            text-shadow: 4px 4px 0px #b84805;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-
-        h3 {
-            font-size: 12px;
-            color: var(--neon-blue);
-            margin: 0;
-            padding-bottom: 10px;
-        }
-
-        /* Contenedores de información */
         .header-box {
             width: 440px;
             background-color: var(--bg-panel);
             border: 4px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 20px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 20px rgba(0,243,255,0.2);
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 10px;
@@ -62,61 +46,23 @@
             align-items: center;
             box-sizing: border-box;
         }
+        .info-panel { font-size: 12px; color: white; text-align: center; }
+        .info-panel span { display: block; font-size: 18px; color: var(--neon-green); margin-top: 5px; text-shadow: 0 0 5px var(--neon-green); }
 
-        .info-panel {
-            font-size: 12px;
-            color: white;
-            text-align: center;
-        }
-
-        .info-panel span {
-            display: block;
-            font-size: 18px;
-            color: var(--neon-green);
-            margin-top: 5px;
-            text-shadow: 0 0 5px var(--neon-green);
-        }
-
-        /* --- TABLERO (PANTALLA) --- */
         #game-wrapper {
             padding: 10px;
             background: #000;
             border-radius: 15px;
-
-            /* Borde base */
             border: 10px solid #333;
-            box-shadow: 0 0 0 4px #555, 0 0 30px rgba(0, 0, 0, 0.8);
-
-            /* AQUÍ ESTÁ EL TRUCO: Cuando le quitamos la clase, tarda 1.5s en volver a ser gris */
-            transition: border-color 0.1s ease-out, box-shadow 0.1 ease-out;
+            box-shadow: 0 0 0 4px #555, 0 0 30px rgba(0,0,0,0.8);
+            transition: border-color 0.1s ease-out, box-shadow 0.1s ease-out;
         }
 
-        /* 2. LOS DESTELLOS (Definen cómo se ENCIENDE el color) */
-        /* Añadimos 'transition: none' para que el color aparezca DE GOLPE al pulsar */
-
-        .flash-up {
-            border-top-color: #ffee00 !important;
-            box-shadow: 0 -20px 50px #ffee00, inset 0 10px 30px rgba(255, 238, 0, 0.4) !important;
-            transition: none !important;
-        }
-
-        .flash-down {
-            border-bottom-color: #ff00ff !important;
-            box-shadow: 0 20px 50px #ff00ff, inset 0 -10px 30px rgba(255, 0, 255, 0.4) !important;
-            transition: none !important;
-        }
-
-        .flash-left {
-            border-left-color: #00f3ff !important;
-            box-shadow: -20px 0 50px #00f3ff, inset 10px 0 30px rgba(0, 243, 255, 0.4) !important;
-            transition: none !important;
-        }
-
-        .flash-right {
-            border-right-color: #0aff00 !important;
-            box-shadow: 20px 0 50px #0aff00, inset -10px 0 30px rgba(10, 255, 0, 0.4) !important;
-            transition: none !important;
-        }
+        /* FLASHES (ya sin !important, funcionan perfectos) */
+        #game-wrapper.flash-up    { border-top-color: #ffee00;    box-shadow: 0 -20px 50px #ffee00, inset 0 10px 30px rgba(255,238,0,0.4); transition: none; }
+        #game-wrapper.flash-down  { border-bottom-color: #ff00ff; box-shadow: 0 20px 50px #ff00ff, inset 0 -10px 30px rgba(255,0,255,0.4); transition: none; }
+        #game-wrapper.flash-left  { border-left-color: #00f3ff;   box-shadow: -20px 0 50px #00f3ff, inset 10px 0 30px rgba(0,243,255,0.4); transition: none; }
+        #game-wrapper.flash-right { border-right-color: #0aff00;  box-shadow: 20px 0 50px #0aff00, inset -10px 0 30px rgba(10,255,0,0.4); transition: none; }
 
         .grid {
             display: grid;
@@ -129,8 +75,6 @@
             position: relative;
             border: 2px solid #333;
         }
-
-        /* Celdas individuales (Con transición para fluidez) */
         .cell {
             display: flex;
             justify-content: center;
@@ -139,245 +83,112 @@
             font-weight: bold;
             color: #fff;
             border-radius: 4px;
-            box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.4), inset -2px -2px 0px rgba(0, 0, 0, 0.4);
+            box-shadow: inset 2px 2px 0px rgba(255,255,255,0.4), inset -2px -2px 0px rgba(0,0,0,0.4);
             text-shadow: 2px 2px 0 #000;
-
-            /* ESTO HACE LA MAGIA DEL MOVIMIENTO FLUIDO */
             transition: all 0.15s ease-in-out;
-            transform: scale(1);
         }
 
-        /* --- COLORES NEÓN PARA LAS FICHAS --- */
-        .val-2 {
-            background-color: #ff0055;
-            box-shadow: 0 0 10px #ff0055;
-        }
+        /* COLORES DE FICHAS (igual que antes) */
+        .val-2 { background-color: #ff0055; box-shadow: 0 0 10px #ff0055; }
+        .val-4 { background-color: #ff5e00; box-shadow: 0 0 10px #ff5e00; }
+        .val-8 { background-color: #ffcc00; color:#000; text-shadow:none; box-shadow: 0 0 10px #ffcc00; }
+        .val-16 { background-color: #ccff00; color:#000; text-shadow:none; box-shadow: 0 0 10px #ccff00; }
+        .val-32 { background-color: #00ff66; color:#000; text-shadow:none; box-shadow: 0 0 10px #00ff66; }
+        .val-64 { background-color: #00ffff; color:#000; text-shadow:none; box-shadow: 0 0 10px #00ffff; }
+        .val-128 { background-color: #0066ff; box-shadow: 0 0 15px #0066ff; }
+        .val-256 { background-color: #9900ff; box-shadow: 0 0 15px #9900ff; }
+        .val-512 { background-color: #ff00cc; box-shadow: 0 0 20px #ff00cc; }
+        .val-1024 { background-color: #ffffff; color:#000; text-shadow:none; box-shadow: 0 0 25px #ffffff; }
+        .val-2048 { background-color: #ffd700; color:#000; border: 2px solid white; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05);box-shadow:0 0 30px gold} }
 
-        .val-4 {
-            background-color: #ff5e00;
-            box-shadow: 0 0 10px #ff5e00;
-        }
-
-        .val-8 {
-            background-color: #ffcc00;
-            color: #000;
-            text-shadow: none;
-            box-shadow: 0 0 10px #ffcc00;
-        }
-
-        .val-16 {
-            background-color: #ccff00;
-            color: #000;
-            text-shadow: none;
-            box-shadow: 0 0 10px #ccff00;
-        }
-
-        .val-32 {
-            background-color: #00ff66;
-            color: #000;
-            text-shadow: none;
-            box-shadow: 0 0 10px #00ff66;
-        }
-
-        .val-64 {
-            background-color: #00ffff;
-            color: #000;
-            text-shadow: none;
-            box-shadow: 0 0 10px #00ffff;
-        }
-
-        .val-128 {
-            background-color: #0066ff;
-            box-shadow: 0 0 15px #0066ff;
-        }
-
-        .val-256 {
-            background-color: #9900ff;
-            box-shadow: 0 0 15px #9900ff;
-        }
-
-        .val-512 {
-            background-color: #ff00cc;
-            box-shadow: 0 0 20px #ff00cc;
-        }
-
-        .val-1024 {
-            background-color: #ffffff;
-            color: #000;
-            text-shadow: none;
-            box-shadow: 0 0 25px #ffffff;
-        }
-
-        .val-2048 {
-            background-color: #ffd700;
-            color: #000;
-            border: 2px solid white;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 10px gold;
-            }
-
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 30px gold;
-            }
-
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 10px gold;
-            }
-        }
-
-        /* --- OVERLAY (GAME OVER) --- */
         #message-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            display: none;
-            z-index: 10;
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
-            border: 2px solid var(--neon-pink);
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background-color: rgba(0,0,0,0.9); display:none; flex-direction:column;
+            justify-content:center; align-items:center; z-index:10;
+            color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); border: 2px solid var(--neon-pink);
         }
 
-        #game-message {
-            font-size: 30px;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        /* --- BOTONES ARCADE --- */
         button {
-            padding: 12px 20px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            color: white;
-            background-color: #d60000;
-            border: none;
-            border-bottom: 6px solid #800000;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.1s;
-            text-transform: uppercase;
-            margin-top: 10px;
+            padding: 12px 20px; font-family: 'Press Start 2P', cursive; font-size: 12px;
+            color: white; background-color: #d60000; border: none; border-bottom: 6px solid #800000;
+            border-radius: 6px; cursor: pointer; transition: all 0.1s; text-transform: uppercase; margin-top: 10px;
         }
+        button:active { transform: translateY(4px); border-bottom: 2px solid #800000; }
+        button:hover { background-color: #ff1a1a; box-shadow: 0 0 15px rgba(255,0,0,0.7); }
 
-        button:active {
-            transform: translateY(4px);
-            border-bottom: 2px solid #800000;
+        .timer-low span { color: red !important; text-shadow: 0 0 10px red; animation: blink 0.5s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        p { font-size: 10px; color: #888; margin-top: 15px; }
+
+        /* BOTÓN MALDITO */
+        #cursed-button {
+            position: fixed; top: 20px; right: 20px; padding: 15px 25px;
+            background: linear-gradient(45deg, #8B0000, #FF0000); color: #00ff00;
+            border: 4px solid #00ff00; border-radius: 10px; font-size: 14px; font-weight: bold;
+            text-shadow: 0 0 10px #00ff00; box-shadow: 0 0 30px red, inset 0 0 20px rgba(255,0,0,0.5);
+            cursor: pointer; z-index: 9999; animation: pulse-cursed 2s infinite;
         }
+        #cursed-button:hover { transform: scale(1.1); box-shadow: 0 0 60px red; }
+        @keyframes pulse-cursed { 0%,100%{box-shadow:0 0 30px red} 50%{box-shadow:0 0 60px #ff0066} }
 
-        button:hover {
-            background-color: #ff1a1a;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+        /* SCREAMER OVERLAY */
+        #screamer-overlay {
+            display: none; position: fixed; top:0; left:0; width:100vw; height:100vh;
+            background:#000; z-index:99999; overflow:hidden;
         }
-
-        /* --- TEMPORIZADOR BAJO --- */
-        .timer-low span {
-            color: red !important;
-            text-shadow: 0 0 10px red;
-            animation: blink 0.5s infinite;
-        }
-
-        @keyframes blink {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-
-        p {
-            font-size: 10px;
-            color: #888;
-            margin-top: 15px;
-        }
-
+        #screamer-image { width:100%; height:100%; object-fit:contain; }
     </style>
 </head>
 <body>
+
     <div class="header-box">
-        <div>
-            <h3>JUGADOR</h3>
-            <span style="color: var(--neon-yellow); text-shadow: 0 0 5px gold;">{{ $currentPlayer->nickname }}</span>
-        </div>
-            <h1>2048</h1>
+        <div><h3>JUGADOR</h3><span style="color:var(--neon-yellow);text-shadow:0 0 5px gold;">{{ $currentPlayer->nickname }}</span></div>
+        <h1>2048</h1>
     </div>
-    
 
     <div id="game-wrapper">
         <div class="grid" id="grid-container"></div>
-
         <div id="message-overlay">
             <h2 id="game-message"></h2>
-            <button onclick="startGame()">
-                REINTENTAR
-            </button>
-
-            <form action="{{ route('player.logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn-logout-overlay">
-                    LOGOUT
-                </button>
+            <button onclick="startGame()">REINTENTAR</button>
+            <form action="{{ route('player.logout') }}" method="POST">@csrf
+                <button type="submit">LOGOUT</button>
             </form>
-
         </div>
     </div>
 
-    <div class="header-box" style="margin-top: 20px; border-color: var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink), inset 0 0 20px rgba(255, 0, 255, 0.2);">
+    <!-- BOTÓN MALDITO -->
+    <button id="cursed-button">NO PULSES<br>ESTE BOTÓN</button>
 
-        <div class="info-panel">
-            PUNTOS
-            <span id="score">0</span>
-        </div>
-
-        <button id="new-game-btn" onclick="startGame()">
-            RESET
-        </button>
-        <form action="{{ route('player.logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn-logout-overlay">
-                    LOGOUT
-                </button>
-            </form>
-        <div class="info-panel" id="timer-box">
-            TIEMPO
-            <span id="timer">--</span>
-        </div>
+    <!-- SCREAMER OVERLAY -->
+    <div id="screamer-overlay">
+        <img id="screamer-image" src="" alt="SCREAMER">
+        <audio id="screamer-sound" src="/img/screamers/scream.mp3" preload="auto"></audio>
     </div>
 
-    <p>
-        ↑ ↓ ← → PARA MOVER
-    </p>
+    <div class="header-box" style="margin-top:20px;border-color:var(--neon-pink);box-shadow:0 0 15px var(--neon-pink),inset 0 0 20px rgba(255,0,255,0.2);">
+        <div class="info-panel">PUNTOS <span id="score">0</span></div>
+        <button id="new-game-btn" onclick="startGame()">RESET</button>
+        <form action="{{ route('player.logout') }}" method="POST">@csrf
+            <button type="submit">LOGOUT</button>
+        </form>
+        <div class="info-panel" id="timer-box">TIEMPO <span id="timer">--</span></div>
+    </div>
+
+    <p>↑ ↓ ← → PARA MOVER</p>
 
     <script>
-        // Variables globales
         const SIZE = 4;
-        const INITIAL_TIME_SECONDS = 60;
-
-        let grid = Array(SIZE * SIZE).fill(0);
+        const INITIAL_TIME_SECONDS = 120;
+        let grid = Array(SIZE*SIZE).fill(0);
         let score = 0;
-        let previousGrid = [];
-        let timerId = null;
         let timeLeft = INITIAL_TIME_SECONDS;
+        let timerId = null;
+        let chaosLevel = 0;
+        let screamersScheduled = [];
 
-        // Referencias del DOM
         const gridContainer = document.getElementById('grid-container');
         const scoreElement = document.getElementById('score');
         const overlay = document.getElementById('message-overlay');
@@ -385,46 +196,81 @@
         const timerElement = document.getElementById('timer');
         const timerBoxElement = document.getElementById('timer-box');
 
-        // --- LÓGICA DE INICIALIZACIÓN Y VISTA ---
+        // SCREAMER SYSTEM
+        const screamerOverlay = document.getElementById('screamer-overlay');
+        const screamerImage = document.getElementById('screamer-image');
+        const screamerSound = document.getElementById('screamer-sound');
+
+        const SCREAMER_IMAGES = [
+            '/img/screamers/screamer1.jpg',
+            '/img/screamers/screamer2.gif',
+            '/img/screamers/screamer3.png',
+        ];
+
+        function scheduleRandomScreamers() {
+            screamersScheduled = [];
+            const base = chaosLevel === 0 ? 4 : chaosLevel === 1 ? 7 : chaosLevel === 2 ? 11 : 15;
+            const extra = Math.floor(Math.random() * (chaosLevel + 2));
+            const total = base + extra;
+            const used = new Set();
+            while (used.size < total) {
+                used.add(Math.floor(Math.random() * 110) + 5);
+            }
+            screamersScheduled = Array.from(used).sort((a,b)=>a-b);
+        }
+
+        function triggerScreamer() {
+            if (!SCREAMER_IMAGES.length) return;
+            const img = SCREAMER_IMAGES[Math.floor(Math.random()*SCREAMER_IMAGES.length)];
+            screamerImage.src = img + '?v=' + Date.now();
+            screamerOverlay.style.display = 'block';
+            screamerSound.currentTime = 0;
+            screamerSound.play().catch(()=>{});
+            const duration = chaosLevel >= 2 ? 1500 + Math.random()*1000 : 700 + Math.random()*800;
+            setTimeout(()=>screamerOverlay.style.display='none', duration);
+        }
+
+        //boton screamers
+        document.getElementById('cursed-button').addEventListener('click', function() {
+            chaosLevel = Math.min(chaosLevel + 1, 4);
+            this.innerHTML = chaosLevel >= 4 ? "YA ES<br>TARDE" : chaosLevel >= 2 ? "ESTÁS<br>MUERTO" : "NO PULSES<br>ESTE BOTÓN";
+            this.style.background = chaosLevel >= 3 ? '#000' : 'linear-gradient(45deg,#8B0000,#FF0000)';
+            this.style.color = chaosLevel >= 3 ? '#ff0000' : '#00ff00';
+            this.style.borderColor = chaosLevel >= 3 ? '#ff0000' : '#00ff00';
+            scheduleRandomScreamers();
+            setTimeout(triggerScreamer, 300);
+        });
+
         function initGame() {
-            grid = Array(SIZE * SIZE).fill(0);
-            score = 0;
-            timeLeft = INITIAL_TIME_SECONDS;
-
-            clearInterval(timerId);
-
-            updateScore();
-            updateTimerDisplay();
-            overlay.style.display = 'none';
-            agregarNumeroAleatorio();
-            agregarNumeroAleatorio();
-            dibujarTablero();
-            startTimer();
+            grid = Array(SIZE*SIZE).fill(0); score = 0; timeLeft = INITIAL_TIME_SECONDS; chaosLevel = 0;
+            document.getElementById('cursed-button').innerHTML = "NO PULSES<br>ESTE BOTÓN";
+            document.getElementById('cursed-button').style.background = 'linear-gradient(45deg,#8B0000,#FF0000)';
+            document.getElementById('cursed-button').style.color = '#00ff00';
+            clearInterval(timerId); updateScore(); updateTimerDisplay(); overlay.style.display='none';
+            agregarNumeroAleatorio(); agregarNumeroAleatorio(); dibujarTablero();
+            scheduleRandomScreamers(); startTimer();
         }
 
         function startTimer() {
             clearInterval(timerId);
-
-            timerId = setInterval(() => {
+            timerId = setInterval(()=>{
                 timeLeft--;
                 updateTimerDisplay();
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerId);
-                    if (overlay.style.display === 'none') {
-                        endGame("¡TIEMPO AGOTADO!");
-                    }
-                }
-            }, 1000);
+                if(timeLeft<=0){ clearInterval(timerId); if(overlay.style.display==='none') endGame("¡TIEMPO AGOTADO!"); }
+            },1000);
         }
 
         function updateTimerDisplay() {
             timerElement.textContent = `${timeLeft}s`;
-            if (timeLeft <= 10 && timeLeft > 0) {
-                timerBoxElement.classList.add('timer-low');
-            } else {
-                timerBoxElement.classList.remove('timer-low');
+            if(timeLeft<=10 && timeLeft>0) timerBoxElement.classList.add('timer-low');
+            else timerBoxElement.classList.remove('timer-low');
+
+            if(screamersScheduled.includes(timeLeft)){
+                setTimeout(triggerScreamer, Math.random()*400);
+                screamersScheduled = screamersScheduled.filter(t=>t!==timeLeft);
             }
+            const extraChance = chaosLevel===0?0.002:chaosLevel===1?0.008:chaosLevel===2?0.02:0.05;
+            if(Math.random()<extraChance && timeLeft>10) setTimeout(triggerScreamer, Math.random()*600);
         }
 
         function agregarNumeroAleatorio() {
