@@ -122,7 +122,7 @@
 
         p { font-size: 10px; color: #888; margin-top: 15px; }
 
-        /* BOTÓN MALDITO */
+        /* boton screamers */
         #cursed-button {
             position: fixed; top: 20px; right: 20px; padding: 15px 25px;
             background: linear-gradient(45deg, #8B0000, #FF0000); color: #00ff00;
@@ -159,7 +159,7 @@
         </div>
     </div>
 
-    <!-- BOTÓN MALDITO -->
+    <!-- boton screamers -->
     <button id="cursed-button">NO PULSES<br>ESTE BOTÓN</button>
 
     <!-- SCREAMER OVERLAY -->
