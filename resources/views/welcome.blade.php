@@ -39,7 +39,7 @@
             content: "";
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: url('/img/background.gif') center center / cover no-repeat;
+            background: url('/img/gif1.gif') center center / cover no-repeat;
             z-index: -2;
         }
 
