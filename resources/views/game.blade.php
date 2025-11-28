@@ -58,7 +58,6 @@
             transition: border-color 0.1s ease-out, box-shadow 0.1s ease-out;
         }
 
-        /* FLASHES (ya sin !important, funcionan perfectos) */
         #game-wrapper.flash-up    { border-top-color: #ffee00;    box-shadow: 0 -20px 50px #ffee00, inset 0 10px 30px rgba(255,238,0,0.4); transition: none; }
         #game-wrapper.flash-down  { border-bottom-color: #ff00ff; box-shadow: 0 20px 50px #ff00ff, inset 0 -10px 30px rgba(255,0,255,0.4); transition: none; }
         #game-wrapper.flash-left  { border-left-color: #00f3ff;   box-shadow: -20px 0 50px #00f3ff, inset 10px 0 30px rgba(0,243,255,0.4); transition: none; }
@@ -88,7 +87,6 @@
             transition: all 0.15s ease-in-out;
         }
 
-        /* COLORES DE FICHAS (igual que antes) */
         .val-2 { background-color: #ff0055; box-shadow: 0 0 10px #ff0055; }
         .val-4 { background-color: #ff5e00; box-shadow: 0 0 10px #ff5e00; }
         .val-8 { background-color: #ffcc00; color:#000; text-shadow:none; box-shadow: 0 0 10px #ffcc00; }
@@ -122,7 +120,7 @@
 
         p { font-size: 10px; color: #888; margin-top: 15px; }
 
-        /* boton screamers */
+        /* Botón screamers */
         #cursed-button {
             position: fixed; top: 20px; right: 20px; padding: 15px 25px;
             background: linear-gradient(45deg, #8B0000, #FF0000); color: #00ff00;
@@ -133,18 +131,20 @@
         #cursed-button:hover { transform: scale(1.1); box-shadow: 0 0 60px red; }
         @keyframes pulse-cursed { 0%,100%{box-shadow:0 0 30px red} 50%{box-shadow:0 0 60px #ff0066} }
 
-        /* SCREAMER OVERLAY */
+        /* overlay screamers para que salte */
         #screamer-overlay {
             display: none; position: fixed; top:0; left:0; width:100vw; height:100vh;
             background:#000; z-index:99999; overflow:hidden;
         }
         #screamer-image { width:100%; height:100%; object-fit:contain; }
+        .flash-red { animation: flashRed 0.1s infinite alternate; }
+        @keyframes flashRed { from {background-color: #000;} to {background-color: #800000;} }
     </style>
 </head>
 <body>
 
     <div class="header-box">
-        <div><h3>JUGADOR</h3><span style="color:var(--neon-yellow);text-shadow:0 0 5px gold;">{{ $currentPlayer->nickname }}</span></div>
+        <div><h3>Inición Sesiada</h3><span style="color:var(--neon-yellow);text-shadow:0 0 5px gold;">{{ $currentPlayer->nickname }}</span></div>
         <h1>2048</h1>
     </div>
 
@@ -159,10 +159,8 @@
         </div>
     </div>
 
-    <!-- boton screamers -->
     <button id="cursed-button">NO PULSES<br>ESTE BOTÓN</button>
 
-    <!-- SCREAMER OVERLAY -->
     <div id="screamer-overlay">
         <img id="screamer-image" src="" alt="SCREAMER">
         <audio id="screamer-sound" src="/img/screamers/scream.mp3" preload="auto"></audio>
@@ -188,6 +186,7 @@
         let timerId = null;
         let chaosLevel = 0;
         let screamersScheduled = [];
+        let finalScreamerTriggered = false;
 
         const gridContainer = document.getElementById('grid-container');
         const scoreElement = document.getElementById('score');
@@ -196,7 +195,6 @@
         const timerElement = document.getElementById('timer');
         const timerBoxElement = document.getElementById('timer-box');
 
-        // SCREAMER SYSTEM
         const screamerOverlay = document.getElementById('screamer-overlay');
         const screamerImage = document.getElementById('screamer-image');
         const screamerSound = document.getElementById('screamer-sound');
@@ -207,30 +205,50 @@
             '/img/screamers/screamer3.png',
         ];
 
+        // screamers random
         function scheduleRandomScreamers() {
             screamersScheduled = [];
-            const base = chaosLevel === 0 ? 4 : chaosLevel === 1 ? 7 : chaosLevel === 2 ? 11 : 15;
-            const extra = Math.floor(Math.random() * (chaosLevel + 2));
+            const base = chaosLevel === 0 ? 1 : chaosLevel === 1 ? 3 : chaosLevel === 2 ? 6 : 9;
+            const extra = Math.floor(Math.random() * (chaosLevel <= 1 ? 2 : chaosLevel === 2 ? 3 : 4));
             const total = base + extra;
+
             const used = new Set();
-            while (used.size < total) {
-                used.add(Math.floor(Math.random() * 110) + 5);
+            while (used.size < total && used.size < 90) {
+                used.add(Math.floor(Math.random() * 90) + 15);
             }
             screamersScheduled = Array.from(used).sort((a,b)=>a-b);
         }
 
-        function triggerScreamer() {
+        function triggerScreamer(duration = null) {
             if (!SCREAMER_IMAGES.length) return;
             const img = SCREAMER_IMAGES[Math.floor(Math.random()*SCREAMER_IMAGES.length)];
             screamerImage.src = img + '?v=' + Date.now();
             screamerOverlay.style.display = 'block';
             screamerSound.currentTime = 0;
+            screamerSound.volume = 1.0;
             screamerSound.play().catch(()=>{});
-            const duration = chaosLevel >= 2 ? 1500 + Math.random()*1000 : 700 + Math.random()*800;
-            setTimeout(()=>screamerOverlay.style.display='none', duration);
+            const dur = duration || (chaosLevel >= 2 ? 1200 + Math.random()*800 : 600 + Math.random()*400);
+            setTimeout(()=>screamerOverlay.style.display='none', dur);
         }
 
-        //boton screamers
+        //screamer al acabar el juego o el tiempo
+        function triggerFinalScreamer() {
+            if (finalScreamerTriggered) return;
+            finalScreamerTriggered = true;
+
+            screamerImage.src = '/img/screamers/screamer2.gif?' + Date.now();
+            screamerOverlay.style.display = 'block';
+            document.body.classList.add('flash-red');
+            screamerSound.currentTime = 0;
+            screamerSound.volume = 1.0;
+            screamerSound.play().catch(()=>{});
+
+            setTimeout(() => {
+                screamerOverlay.style.display = 'none';
+                document.body.classList.remove('flash-red');
+            }, 2600);
+        }
+
         document.getElementById('cursed-button').addEventListener('click', function() {
             chaosLevel = Math.min(chaosLevel + 1, 4);
             this.innerHTML = chaosLevel >= 4 ? "YA ES<br>TARDE" : chaosLevel >= 2 ? "ESTÁS<br>MUERTO" : "NO PULSES<br>ESTE BOTÓN";
@@ -238,17 +256,26 @@
             this.style.color = chaosLevel >= 3 ? '#ff0000' : '#00ff00';
             this.style.borderColor = chaosLevel >= 3 ? '#ff0000' : '#00ff00';
             scheduleRandomScreamers();
-            setTimeout(triggerScreamer, 300);
         });
 
         function initGame() {
-            grid = Array(SIZE*SIZE).fill(0); score = 0; timeLeft = INITIAL_TIME_SECONDS; chaosLevel = 0;
+            grid = Array(SIZE*SIZE).fill(0);
+            score = 0;
+            timeLeft = INITIAL_TIME_SECONDS;
+            chaosLevel = 0;
+            finalScreamerTriggered = false;
             document.getElementById('cursed-button').innerHTML = "NO PULSES<br>ESTE BOTÓN";
             document.getElementById('cursed-button').style.background = 'linear-gradient(45deg,#8B0000,#FF0000)';
             document.getElementById('cursed-button').style.color = '#00ff00';
-            clearInterval(timerId); updateScore(); updateTimerDisplay(); overlay.style.display='none';
-            agregarNumeroAleatorio(); agregarNumeroAleatorio(); dibujarTablero();
-            scheduleRandomScreamers(); startTimer();
+            clearInterval(timerId);
+            updateScore();
+            updateTimerDisplay();
+            overlay.style.display='none';
+            agregarNumeroAleatorio();
+            agregarNumeroAleatorio();
+            dibujarTablero();
+            scheduleRandomScreamers();
+            startTimer();
         }
 
         function startTimer() {
@@ -256,7 +283,10 @@
             timerId = setInterval(()=>{
                 timeLeft--;
                 updateTimerDisplay();
-                if(timeLeft<=0){ clearInterval(timerId); if(overlay.style.display==='none') endGame("¡TIEMPO AGOTADO!"); }
+                if(timeLeft<=0){
+                    clearInterval(timerId);
+                    if(overlay.style.display==='none') endGame("¡TIEMPO AGOTADO!");
+                }
             },1000);
         }
 
@@ -266,44 +296,40 @@
             else timerBoxElement.classList.remove('timer-low');
 
             if(screamersScheduled.includes(timeLeft)){
-                setTimeout(triggerScreamer, Math.random()*400);
+                setTimeout(()=>triggerScreamer(), Math.random()*300);
                 screamersScheduled = screamersScheduled.filter(t=>t!==timeLeft);
             }
-            const extraChance = chaosLevel===0?0.002:chaosLevel===1?0.008:chaosLevel===2?0.02:0.05;
-            if(Math.random()<extraChance && timeLeft>10) setTimeout(triggerScreamer, Math.random()*600);
+
+            if (chaosLevel > 0) {
+                const extraChance = chaosLevel === 1 ? 0.003 : chaosLevel === 2 ? 0.008 : chaosLevel >= 3 ? 0.015 : 0;
+                if(Math.random() < extraChance && timeLeft > 10) {
+                    setTimeout(()=>triggerScreamer(), Math.random()*500);
+                }
+            }
         }
 
         function agregarNumeroAleatorio() {
             let vacios = [];
-            for (let i = 0; i < grid.length; i++) {
-                if (grid[i] === 0) vacios.push(i);
-            }
+            for (let i = 0; i < grid.length; i++) if (grid[i] === 0) vacios.push(i);
             if (vacios.length === 0) return;
             let indiceAleatorio = vacios[Math.floor(Math.random() * vacios.length)];
             grid[indiceAleatorio] = Math.random() > 0.9 ? 4 : 2;
         }
 
-        // --- DIBUJAR TABLERO (VERSIÓN FLUIDA) ---
         function dibujarTablero() {
-            // 1. Si no existen las celdas, las creamos (Solo la primera vez)
             if (gridContainer.children.length === 0) {
                 for (let i = 0; i < SIZE * SIZE; i++) {
                     const cell = document.createElement('div');
-                    cell.className = 'cell'; // Clase base
+                    cell.className = 'cell';
                     gridContainer.appendChild(cell);
                 }
             }
-
-            // 2. Si ya existen, solo actualizamos su contenido y color
             const cells = gridContainer.children;
             for (let i = 0; i < grid.length; i++) {
                 let valor = grid[i];
                 const cell = cells[i];
-
                 cell.className = `cell val-${valor}`;
                 cell.textContent = valor > 0 ? valor : '';
-
-                // Truco visual para que las vacías no tengan sombra
                 if (valor === 0) {
                     cell.style.backgroundColor = 'transparent';
                     cell.style.boxShadow = 'none';
@@ -314,11 +340,8 @@
             }
         }
 
-        function updateScore() {
-            scoreElement.textContent = score;
-        }
+        function updateScore() { scoreElement.textContent = score; }
 
-        // --- LÓGICA DE MOVIMIENTO ---
         function operateLine(line) {
             let newLine = line.filter(val => val !== 0);
             for (let i = 0; i < newLine.length - 1; i++) {
@@ -329,9 +352,7 @@
                 }
             }
             newLine = newLine.filter(val => val !== 0);
-            while (newLine.length < SIZE) {
-                newLine.push(0);
-            }
+            while (newLine.length < SIZE) newLine.push(0);
             return newLine;
         }
 
@@ -344,13 +365,9 @@
 
             const lineIndices = [];
             if (direction === 'left' || direction === 'right') {
-                for (let r = 0; r < SIZE; r++) {
-                    lineIndices.push([r * 4, r * 4 + 1, r * 4 + 2, r * 4 + 3]);
-                }
+                for (let r = 0; r < SIZE; r++) lineIndices.push([r*4, r*4+1, r*4+2, r*4+3]);
             } else {
-                for (let c = 0; c < SIZE; c++) {
-                    lineIndices.push([c, c + 4, c + 8, c + 12]);
-                }
+                for (let c = 0; c < SIZE; c++) lineIndices.push([c, c+4, c+8, c+12]);
             }
 
             for (const indices of lineIndices) {
@@ -358,14 +375,10 @@
                 if (direction === 'right' || direction === 'down') line.reverse();
                 const newLine = operateLine(line);
                 if (direction === 'right' || direction === 'down') newLine.reverse();
-                for (let k = 0; k < SIZE; k++) {
-                    newGrid[indices[k]] = newLine[k];
-                }
+                for (let k = 0; k < SIZE; k++) newGrid[indices[k]] = newLine[k];
             }
 
-            if (prevGridSnapshot !== JSON.stringify(newGrid)) {
-                boardMoved = true;
-            }
+            if (prevGridSnapshot !== JSON.stringify(newGrid)) boardMoved = true;
 
             if (boardMoved) {
                 grid = newGrid;
@@ -378,12 +391,10 @@
 
         function checkGameState() {
             if (grid.includes(2048)) {
-                endGame("¡GANASTE! 🎉");
+                endGame("¡GANASTE!");
                 return;
             }
-            if (!canMove()) {
-                endGame("FIN DEL JUEGO 😔");
-            }
+            if (!canMove()) endGame("FIN DEL JUEGO");
         }
 
         function canMove() {
@@ -398,93 +409,60 @@
             return false;
         }
 
-        // --- LUCES DE BORDE ---
         function iluminarBorde(direction) {
             const wrapper = document.getElementById('game-wrapper');
-            // console.log("Iluminando borde:", direction); // Descomenta para depurar
-
-            if (!wrapper) return;
-
             wrapper.classList.remove('flash-up', 'flash-down', 'flash-left', 'flash-right');
-            void wrapper.offsetWidth; // Reset animation hack
+            void wrapper.offsetWidth;
             wrapper.classList.add(`flash-${direction}`);
-
-            setTimeout(() => {
-                wrapper.classList.remove(`flash-${direction}`);
-            }, 200);
+            setTimeout(() => wrapper.classList.remove(`flash-${direction}`), 200);
         }
 
         function enviarPuntaje(puntos) {
-            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
-            const token = tokenMeta ? tokenMeta.getAttribute('content') : '';
-
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             fetch('/guardar-score', {
-                    method: 'POST'
-                    , headers: {
-                        'Content-Type': 'application/json'
-                        , 'X-CSRF-TOKEN': token
-                    }
-                    , body: JSON.stringify({
-                        score: puntos
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const msgElement = document.getElementById('game-message');
-                    msgElement.innerHTML += `<br><span style="font-size:20px; color:green">${data.message}</span>`;
-                })
-                .catch(error => console.error('Error:', error));
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({ score: puntos })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('game-message').innerHTML += `<br><span style="font-size:20px; color:green">${data.message}</span>`;
+            })
+            .catch(() => {});
         }
 
         function endGame(msg) {
             clearInterval(timerId);
             message.innerHTML = msg;
             overlay.style.display = 'flex';
-
-            if (score > 0) {
-                enviarPuntaje(score);
-            }
-
+            if (score > 0) enviarPuntaje(score);
+            setTimeout(triggerFinalScreamer, 800);
         }
 
-        // --- MANEJADOR DE TECLADO UNIFICADO ---
         function handleKeyPress(event) {
-            if (overlay.style.display === 'none' && /**/ timeLeft > 0) {
+            if (overlay.style.display === 'none' && timeLeft > 0) {
                 let direction = null;
                 switch (event.key) {
-                    case 'ArrowLeft':
-                    case 'a':
-                        direction = 'left';
-                        break;
-                    case 'ArrowRight':
-                    case 'd':
-                        direction = 'right';
-                        break;
-                    case 'ArrowUp':
-                    case 'w':
-                        direction = 'up';
-                        break;
-                    case 'ArrowDown':
-                    case 's':
-                        direction = 'down';
-                        break;
+                    case 'ArrowLeft': case 'a': direction = 'left'; break;
+                    case 'ArrowRight': case 'd': direction = 'right'; break;
+                    case 'ArrowUp': case 'w': direction = 'up'; break;
+                    case 'ArrowDown': case 's': direction = 'down'; break;
                 }
-
                 if (direction) {
                     event.preventDefault();
-                    iluminarBorde(direction); // Efecto visual
-                    move(direction); // Movimiento lógico
+                    iluminarBorde(direction);
+                    move(direction);
                 }
             }
         }
 
-        function startGame() {
-            initGame();
-        }
+        function startGame() { initGame(); }
 
         document.addEventListener('keydown', handleKeyPress);
         startGame();
-
     </script>
 </body>
 </html>
